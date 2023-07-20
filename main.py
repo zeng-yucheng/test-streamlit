@@ -36,6 +36,7 @@ def visualize_data(random_numbers):
 
 def main():
     st.title("Random Number Generator & Visualization")
+    st.set_option('deprecation.showPyplotGlobalUse', False)
 
     # Create tabs for generation and download/visualization
     tabs = st.sidebar.radio("Select Action:", ("Generate Numbers", "Download & Visualize"))
