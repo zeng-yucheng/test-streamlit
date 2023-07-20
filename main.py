@@ -4,6 +4,7 @@ import time
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
 
 def generate_random_number(min_value, max_value):
     return random.randint(min_value, max_value)
@@ -27,7 +28,7 @@ def run_command(min_value, max_value, num_samples):
 def visualize_data(random_numbers):
     # Create a histogram to visualize the distribution of random numbers
     plt.figure(figsize=(8, 6))
-    sns.histplot(random_numbers, bins=10, kde=True)
+    sns.histplot(np.(random_numbers), bins=10, kde=True)
     plt.xlabel('Random Numbers')
     plt.ylabel('Frequency')
     plt.title('Distribution of Random Numbers')
