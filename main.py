@@ -1,43 +1,67 @@
 import streamlit as st
-import subprocess
+import random
 import time
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-def run_command(param1, param2):
-    # Replace this command with the actual command you want to run
-    command = f"echo 'Parameter 1: {param1}, Parameter 2: {param2}' && sleep 2 && echo 'Command running...' && sleep 2 && echo 'Command running...' && sleep 2 && echo 'Command completed!' > output.txt"
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+def generate_random_number(min_value, max_value):
+    return random.randint(min_value, max_value)
 
+def run_command(min_value, max_value, num_samples):
     # Display an empty text element for command output
     output_text = st.empty()
 
-    # Update the text element and save to the file as the command runs
+    # Generate random numbers one by one and update the text element as the command runs
     log = ""
-    with open("output.txt", "w") as file:
-        while True:
-            line = process.stdout.readline()
-            if not line:
-                break
-            log += line
-            output_text.text(log)
-            file.write(line)
+    for i in range(num_samples):
+        random_number = generate_random_number(min_value, max_value)
+        log += f"Sample {i+1}: {random_number}\n"
+        output_text.text(log)
+        time.sleep(0.1)
+
+    # Dump the number samples to a csv file
+    df = pd.DataFrame({'Random Numbers': [generate_random_number(min_value, max_value) for _ in range(num_samples)]})
+    df.to_csv('random_numbers.csv', index=False)
+
+def visualize_data(random_numbers):
+    # Create a histogram to visualize the distribution of random numbers
+    plt.figure(figsize=(8, 6))
+    sns.histplot(random_numbers, bins=10, kde=True)
+    plt.xlabel('Random Numbers')
+    plt.ylabel('Frequency')
+    plt.title('Distribution of Random Numbers')
+    st.pyplot()
 
 def main():
-    st.title("Streamlit App with Command Output Log")
+    st.title("Random Number Generator & Visualization")
 
-    # Input parameters using selection
-    param1 = st.selectbox("Select Parameter 1", [1, 2, 3])
-    param2 = st.selectbox("Select Parameter 2", ["A", "B", "C"])
+    # Create tabs for generation and download/visualization
+    tabs = st.sidebar.radio("Select Action:", ("Generate Numbers", "Download & Visualize"))
 
-    # Run the command
-    if st.button("Run Command"):
-        st.text("Running the command...")
-        run_command(param1, param2)
-        st.text("Command completed!")
+    if tabs == "Generate Numbers":
+        # Input parameters using text inputs and a slider
+        min_value = st.number_input("Enter the minimum boundary of random numbers", value=1)
+        max_value = st.number_input("Enter the maximum boundary of random numbers", value=100)
+        num_samples = st.slider("Enter the quantity of number samples", min_value=1, max_value=100, value=10)
 
-        # Add a button to download the output file
-        with open("output.txt", "r") as file:
+        # Run the command to generate random numbers one by one
+        if st.button("Generate Random Numbers"):
+            st.text("Generating random numbers...")
+            run_command(min_value, max_value, num_samples)
+            st.text("Random number generation completed!")
+
+    elif tabs == "Download & Visualize":
+        # Download the CSV file
+        with open('random_numbers.csv', 'r') as file:
             file_content = file.read()
-        st.download_button("Download Output", data=file_content, file_name="output.txt", mime="text/plain")
+        st.download_button("Download Random Numbers CSV", data=file_content, file_name="random_numbers.csv", mime="text/csv")
+
+        # Visualize the distribution of random numbers
+        if st.button("Visualize"):
+            st.text("Visualizing the distribution of random numbers...")
+            df = pd.read_csv('random_numbers.csv')
+            visualize_data(df['Random Numbers'])
 
 if __name__ == "__main__":
     main()
