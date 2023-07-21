@@ -28,7 +28,7 @@ def run_command(min_value, max_value, num_samples):
 def visualize_data(random_numbers):
     # Create a histogram to visualize the distribution of random numbers
     plt.figure(figsize=(8, 6))
-    sns.histplot(np.array(random_numbers), bins=10, kde=True)
+    sns.histplot(random_numbers, bins=10, kde=True)
     plt.xlabel('Random Numbers')
     plt.ylabel('Frequency')
     plt.title('Distribution of Random Numbers')
